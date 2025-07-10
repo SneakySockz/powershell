@@ -1,1 +1,16 @@
+## Important Disclaimer
+
+Each script in this collection requires the corresponding PowerShell modules to be installed and imported for it to work correctly.  
+Before running any script, please ensure you have installed the necessary modules and are connected to the required services with appropriate permissions.
+
+Common modules used include:
+
+- MSOnline
+- AzureAD
+- ExchangeOnlineManagement
+- MicrosoftTeams
+- SharePointPnPPowerShellOnline
+- Microsoft.Graph (if applicable)
+
+You can install these modules using PowerShell's `Install-Module` cmdlet as shown in the prerequisites script below.
 
