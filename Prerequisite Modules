@@ -14,3 +14,33 @@ Common modules used include:
 
 You can install these modules using PowerShell's `Install-Module` cmdlet as shown in the prerequisites script below.
 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+# Run as Administrator
+$modules = @(
+    "MSOnline",
+    "AzureAD",
+    "ExchangeOnlineManagement",
+    "MicrosoftTeams",
+    "SharePointPnPPowerShellOnline",
+    "Microsoft.Graph"  # Optional, if you use Microsoft Graph module commands
+)
+
+foreach ($module in $modules) {
+    if (-not (Get-Module -ListAvailable -Name $module)) {
+        Write-Host "Installing module: $module"
+        try {
+            Install-Module -Name $module -Scope CurrentUser -Force -AllowClobber
+            Write-Host "$module installed successfully."
+        } catch {
+            Write-Warning "Failed to install $module. Please install it manually."
+        }
+    } else {
+        Write-Host "Module $module is already installed."
+    }
+}
+
+Write-Host "All prerequisite modules installation attempted. Please ensure you are running PowerShell as Administrator."
