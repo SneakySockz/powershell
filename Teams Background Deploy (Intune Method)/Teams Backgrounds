@@ -1,17 +1,3 @@
-📸 Requirements for Microsoft Teams Backgrounds
-To ensure images work correctly as Teams backgrounds:
-
-Image Format: .jpg, .jpeg, or .png
-Image Size: Recommended resolution is 1920x1080 pixels (16:9 aspect ratio)
-Thumbnail Requirement: Teams automatically generates a thumbnail, but for best results, include a smaller version of the image (e.g., 280x158 pixels) with the same filename and a _thumb suffix (e.g., background.jpg and background_thumb.jpg)
-Placement: Images must be placed in the following folder:
-
-%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\Backgrounds\Uploads
-
-
-
-Script:
-
 # Define source and destination folders
 $sourceFolder = "\\<YourFileServer>\Teams Background"
 $destinationFolder = "$env:LOCALAPPDATA\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\Backgrounds\Uploads"
