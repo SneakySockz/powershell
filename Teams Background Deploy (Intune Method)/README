@@ -1,0 +1,30 @@
+### Microsoft Teams Background Image Deployment Script (PowerShell)
+
+This PowerShell script automates the process of deploying custom background images for Microsoft Teams. It performs the following actions:
+
+1. **Defines the source folder** (e.g., a network share or local directory) containing background images.
+2. **Defines the destination folder** where Microsoft Teams stores custom backgrounds.
+3. **Checks if the destination folder exists** on the user's machine. If not, it creates it.
+4. **Searches for image files** (`.jpg`, `.jpeg`, `.png`) in the source folder.
+5. **Copies each image** to the Teams background upload directory, overwriting existing files if necessary.
+
+This is particularly useful in enterprise environments where consistent branding or themed backgrounds are required across multiple users.
+
+
+### Requirements for Microsoft Teams Background Images
+
+To ensure images work correctly as custom backgrounds in Microsoft Teams, the following requirements should be met:
+
+- **Supported Formats**: `.jpg`, `.jpeg`, `.png`
+- **Recommended Resolution**: `1920x1080` pixels (16:9 aspect ratio)
+- **Thumbnail Requirement**:
+  - Teams automatically generates thumbnails, but for best results, include a smaller version of the image.
+  - Use the same filename with a `_thumb` suffix (e.g., `background.jpg` and `background_thumb.jpg`)
+  - Suggested thumbnail resolution: `280x158` pixels
+
+- **Destination Folder**:
+
+  - For new Teams (Windows Store version):
+    ```
+    %LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\Backgrounds\Uploads
+    ```
