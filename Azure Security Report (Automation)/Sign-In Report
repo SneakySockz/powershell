@@ -1,0 +1,34 @@
+# Load Microsoft Graph Module
+Import-Module Microsoft.Graph.Authentication
+Import-Module Microsoft.Graph.AuditLog
+# Connect to Microsoft Graph
+Connect-MgGraph -Scopes "AuditLog.Read.All"
+# Set date range (last 7 days)
+$startDate = (Get-Date).AddDays(-7).ToString("yyyy-MM-ddTHH:mm:ssZ")
+# Get all sign-in logs from the last 7 days
+$logs = Get-MgAuditLogSignIn -Filter "createdDateTime ge $startDate" -All
+# Filter for successful sign-ins and exclude 'IE' (Ireland) location entries
+$filteredLogs = $logs | Where-Object {
+    $_.Status.ErrorCode -eq 0 -and $_.Location.CountryOrRegion -notlike "*IE*"
+}
+# Process and export
+$processedLogs = $filteredLogs | ForEach-Object {
+    [PSCustomObject]@{
+        UserDisplayName   = $_.UserDisplayName
+        UserPrincipalName = $_.UserPrincipalName
+        CreatedDateTime   = $_.CreatedDateTime
+        IPAddress         = $_.IPAddress
+        Country           = $_.Location.CountryOrRegion
+        City              = $_.Location.City
+        Browser           = $_.DeviceDetail.Browser
+        Device            = $_.DeviceDetail.DisplayName
+        OperatingSystem   = $_.DeviceDetail.OperatingSystem
+        ClientAppUsed     = $_.ClientAppUsed
+        UserAgent         = $_.UserAgent
+        SignInResult      = "Success"
+    }
+}
+# Export to CSV
+$exportPath = "C:\temp\SuccessfulSignIns_ExcludingIE_Last7Days.csv"
+$processedLogs | Export-Csv -Path $exportPath -NoTypeInformation
+Write-Host "`n✅ Export complete: '$exportPath'"
