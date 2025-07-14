@@ -1,0 +1,27 @@
+# Install the Microsoft Graph PowerShell module if not already installed
+Install-Module -Name Microsoft.Graph -Scope CurrentUser
+
+# Connect to Microsoft Graph
+Connect-MgGraph -Scopes "User.Read.All", "AuditLog.Read.All"
+
+# Get all disabled accounts
+$disabledAccounts = Get-MgUser -Filter "accountEnabled eq false"
+
+# Prepare the data for export
+$exportData = @()
+
+foreach ($account in $disabledAccounts) {
+    $signInActivity = Get-MgAuditLogSignIn -Filter "userId eq '$($account.Id)'"
+    if ($signInActivity) {
+        $exportData += [PSCustomObject]@{
+            DisplayName = $account.DisplayName
+            UserPrincipalName = $account.UserPrincipalName
+            LastInteractiveSignInTime = $signInActivity[0].CreatedDateTime
+        }
+    }
+}
+
+# Export the data to a CSV file
+$exportData | Export-Csv -Path "C:\temp\DisabledAccountsSignInActivity.csv" -NoTypeInformation
+
+Write-Host "Export completed. The file is located at C:\temp\DisabledAccountsSignInActivity.csv"
