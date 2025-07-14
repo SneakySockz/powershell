@@ -1,0 +1,31 @@
+# Import the required module
+Import-Module Microsoft.Graph.Users
+ 
+# Connect to Graph (if not already connected)
+# Connect-MgGraph -Scopes "User.Read.All", "AuditLog.Read.All"
+ 
+# Get all guest users (userType = Guest)
+$guests = Get-MgUser -Filter "userType eq 'Guest'" -All
+ 
+# Create a list to store results
+$results = @()
+ 
+# Loop through each guest to get last sign-in info
+foreach ($user in $guests) {
+    $signin = Get-MgAuditLogSignIn -Filter "userId eq '$($user.Id)'" -Top 1 | Sort-Object -Property createdDateTime -Descending | Select-Object -First 1
+ 
+    $lastSignIn = if ($signin) { $signin.CreatedDateTime } else { "Never Signed In" }
+ 
+    $results += [PSCustomObject]@{
+        DisplayName   = $user.DisplayName
+        UserPrincipalName = $user.UserPrincipalName
+        Id            = $user.Id
+        LastSignIn    = $lastSignIn
+    }
+}
+ 
+# Export to CSV
+$results | Export-Csv -Path "GuestUsers_LastSignIn.csv" -NoTypeInformation
+ 
+# Output to console
+$results
