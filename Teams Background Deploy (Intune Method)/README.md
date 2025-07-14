@@ -1,66 +1,82 @@
 # Teams Background Deploy (Intune Method)
 
-This folder contains PowerShell scripts and resources for deploying custom Microsoft Teams backgrounds to users at scale using Microsoft Intune.
+This folder contains PowerShell scripts and resources for deploying custom Microsoft Teams backgrounds to users' devices using Microsoft Intune as a platform script.
 
 ## Purpose
 
-Automatically push branded or curated Teams background images to users' devices. This is useful for:
+Enable automated distribution of branded or approved Teams background images to end-user devices for:
 - Company branding and compliance
-- Event-specific backgrounds
+- Special events or campaigns
 - Ensuring all users have access to approved backgrounds
 
-## How the Deployment Works
+## Deployment Method
 
-1. **Prepare Background Images**  
-   Collect your desired `.jpg` or `.png` images. These will be deployed to users.
+**This solution is designed to be used exclusively as an Intune platform script.**  
+You will deploy the PowerShell script to target devices via Microsoft Intune. The script runs in the user's context and copies background images to the correct Teams directory.
 
-2. **PowerShell Script**  
-   The script copies the background images into Teams' custom backgrounds directory on the user's device:
-   - Default path for Windows:  
-     ```
-     %APPDATA%\Microsoft\Teams\Backgrounds\Uploads
-     ```
+### Teams 2.0/Desktop Backgrounds Path
 
-3. **Packaging for Intune**  
-   - Package the script and images using a tool like the [Microsoft Win32 Content Prep Tool](https://learn.microsoft.com/en-us/mem/intune/apps/apps-win32-app-management).
-   - Upload the package to Intune as a Win32 app.
+Custom backgrounds for the new Teams desktop client are stored in:
+```
+%LOCALAPPDATA%\Packages\MSTeams_8wekyb3d8bbwe\LocalCache\Microsoft\MSTeams\Backgrounds\Uploads
+```
 
-4. **Deployment via Intune**  
-   - Assign the Win32 app to users/devices in your tenant.
-   - When deployed, users will find your custom backgrounds available in Teams.
+## Image Requirements
 
-## Usage Steps
+- **Recommended Image Dimensions:**  
+  - 1920 × 1080 pixels (16:9 aspect ratio) for optimal quality and appearance.
+- **File Formats:**  
+  - `.jpg` or `.png` are supported.
+- **Thumbnail Requirement:**  
+  - For each background image, a corresponding thumbnail image is required.  
+  - Thumbnail images should be named with `_thumb` appended before the file extension (e.g., `background1_thumb.jpg`).
+  - Thumbnail dimensions should ideally be **300 × 190 pixels**.
 
-1. **Edit the Script**  
-   - Update file paths and image names in the script if necessary.
+## Shared Location
 
-2. **Test Locally**  
-   - Run the script manually as the target user to verify it places images correctly.
+To ensure consistency and accessibility:
+- Store all background and thumbnail images in a shared network location (e.g., a file server accessible to all target users).
+- The PowerShell script should be configured to copy images from this shared location to the Teams backgrounds folder on each device when run.
 
-3. **Prepare Deployment Package**  
-   - Place the script and images in a folder.
-   - Use the [Win32 Content Prep Tool](https://github.com/Microsoft/Microsoft-Win32-Content-Prep-Tool) to generate the `.intunewin` package.
+**Example shared path:**  
+```
+\\YourFileServer\TeamsBackgrounds\
+```
+Ensure all devices/users have read access to this network share.
 
-4. **Upload to Intune**  
-   - In the Intune portal, add a new Win32 app.
-   - Upload your `.intunewin` file.
-   - Set install/uninstall commands as needed (install: `powershell.exe -ExecutionPolicy Bypass -File .\DeployTeamsBackgrounds.ps1`).
+## Usage Instructions
 
-5. **Assign and Monitor**  
-   - Assign to user/device groups.
-   - Monitor deployment status in Intune.
+1. **Prepare Images**
+   - Upload your `.jpg` or `.png` background images and their corresponding thumbnails to the shared network folder.
+
+2. **Configure the PowerShell Script**
+   - Make sure the script copies all images and thumbnails from the shared folder (e.g., `\\YourFileServer\TeamsBackgrounds\`) to the user's Teams backgrounds path.
+
+3. **Deploy with Intune**
+   - In the Intune admin portal, add a new platform script.
+   - Upload the PowerShell script.
+   - Set the script to run in the user context (not system context).
+   - Assign the script to the target user/device groups.
+
+4. **Result**
+   - After deployment, users will see your backgrounds available in Teams when choosing video backgrounds.
 
 ## Troubleshooting
 
-- Ensure the script runs with user permissions so it can access `%APPDATA%`.
-- Verify that image files are supported formats (.jpg, .png).
-- If users do not see the backgrounds, confirm Teams has synced and the images are in the correct folder.
+- Make sure the script runs in the user's context so it can access `%LOCALAPPDATA%`.
+- Only use supported image formats and recommended dimensions.
+- Ensure each background has a matching thumbnail image.
+- Confirm all target devices/users have access rights to the shared network folder.
+- Teams client must be updated to the new desktop version (Teams 2.0+) for this path to work.
+- If backgrounds don’t appear, verify that the images are present in the target folder and that Teams is running with the correct profile.
 
 ## Contributing
 
-- Add new deployment tips, alternative packaging methods, or script improvements!
-- Open issues for bugs or enhancement requests.
+- Suggestions for improved scripting, troubleshooting steps, or documentation are welcome!
+- Please open issues for bugs or feature requests.
 
 ---
 
-**For more details on packaging and deploying Win32 apps via Intune, see the [official Microsoft documentation](https://learn.microsoft.com/en-us/mem/intune/apps/apps-win32-app-management).**
+**Note:**  
+This method is intended solely for Intune platform script deployment on Windows devices running the new Microsoft Teams desktop client.  
+For more information on Teams background locations and supported formats, see [Microsoft’s documentation](https://learn.microsoft.com/en-us/microsoftteams/hardware-requirements-for-the-teams-app).
